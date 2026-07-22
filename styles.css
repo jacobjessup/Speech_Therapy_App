@@ -208,6 +208,30 @@ body {
   text-transform: lowercase;
 }
 
+/* Counting groups: several objects drawn together to be counted. */
+.count-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  margin: 0 auto;
+}
+.card .count-group { font-size: 4rem; max-width: 360px; }
+.find-tile .count-group { font-size: 1.9rem; gap: 4px; max-width: 90%; }
+
+/* Uppercase target shown in the letter-matching game. */
+.find-target {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1;
+  margin: 4px 0 14px;
+  text-shadow: 0 4px 0 rgba(0,0,0,0.15);
+}
+.find-target:empty { display: none; }
+
 .feedback {
   text-align: center;
   color: #fff;

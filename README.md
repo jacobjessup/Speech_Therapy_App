@@ -12,7 +12,7 @@ entirely in the browser and works great on a phone or tablet.
 
 ## How to play
 
-1. **Pick a category** on the home screen (ABC, 123, Animals, Food, Colors, …).
+1. **Pick a category** on the home screen (ABC, 123, Counting, Animals, Food, …).
 2. **Choose a game:**
    - **🎤 Say It!** — A big picture appears and the app says the word.
      - Tap **🔊 Listen** to hear it again (nice and slow).
@@ -23,6 +23,15 @@ entirely in the browser and works great on a phone or tablet.
    - **🔍 Find It!** — The app names a word; your child taps the matching picture.
      Great for building understanding even before speech comes.
 3. **Collect stars** ⭐ — they're saved on the device and shown at the top.
+
+### Learning extras
+
+- **ABC** teaches **letter sounds** — the app says the letter *and* its sound
+  ("A. A says aah."). In **Find It!**, ABC becomes an **uppercase → lowercase
+  matching game**: a big `A` appears and your child taps the little `a`.
+- **Counting** shows a group of objects (🐟🐟🐟) so your child can count them
+  and say **how many** — great early number sense to go with the **123**
+  numerals.
 
 ## Tips for grown-ups
 

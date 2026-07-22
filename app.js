@@ -79,6 +79,31 @@
     speechSynthesis.speak(u);
   }
 
+  // What to say for a word. Letters also say their phonics sound
+  // ("A. A says aah.") so kids hear the name and the sound together.
+  function sayText(w) {
+    if (w.sound) return w.word + ". " + w.word + " says " + w.sound + ".";
+    return w.say || w.word;
+  }
+
+  // Draw a word's picture into an element. Counting words draw a group
+  // of objects to be counted; everything else shows a single emoji.
+  function renderPicture(el, w) {
+    el.innerHTML = "";
+    if (w.count && w.item) {
+      const group = document.createElement("div");
+      group.className = "count-group";
+      for (let i = 0; i < w.count; i++) {
+        const span = document.createElement("span");
+        span.textContent = w.item;
+        group.appendChild(span);
+      }
+      el.appendChild(group);
+    } else {
+      el.textContent = w.emoji;
+    }
+  }
+
   // ---------- Speech recognition ("Your turn") ----------
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const canRecognize = !!SR;
@@ -200,12 +225,12 @@
 
   function renderSay() {
     const w = currentWord();
-    $("#sayEmoji").textContent = w.emoji;
+    renderPicture($("#sayEmoji"), w);
     $("#sayWord").textContent = w.word;
     setFeedback("#sayFeedback", "", "");
     renderProgress("#sayProgress", state.order.length, state.pos);
-    // Auto-model the word when a new card appears.
-    speak(w.word);
+    // Auto-model the word (and letter sound) when a new card appears.
+    speak(sayText(w));
   }
 
   function renderProgress(sel, total, pos) {
@@ -293,17 +318,29 @@
 
   function nextFind() {
     const words = state.category.words;
+    const isLetters = state.category.id === "letters";
     const choiceCount = Math.min(4, words.length);
     const picks = shuffled(words).slice(0, choiceCount);
     findState.target = picks[Math.floor(Math.random() * picks.length)];
     findState.tiles = shuffled(picks);
+
+    // Letters play as an uppercase→lowercase matching game: we show the
+    // big UPPERCASE letter and the tiles are the little (lowercase) ones.
+    $("#findPromptText").textContent = isLetters
+      ? "Find the little letter!"
+      : "Where is the…";
+    $("#findTarget").textContent = isLetters ? findState.target.word : "";
 
     const grid = $("#findGrid");
     grid.innerHTML = "";
     findState.tiles.forEach((w) => {
       const tile = document.createElement("button");
       tile.className = "find-tile";
-      tile.textContent = w.emoji;
+      if (isLetters) {
+        tile.textContent = w.word.toLowerCase();
+      } else {
+        renderPicture(tile, w);
+      }
       tile.setAttribute("aria-label", w.word);
       tile.addEventListener("click", () => onFindPick(w, tile));
       grid.appendChild(tile);
@@ -318,7 +355,7 @@
     if (w.word === findState.target.word) {
       tile.classList.add("correct");
       addStar(1);
-      setFeedback("#findFeedback", "Yes! That's the " + w.word + "! ⭐", "good");
+      setFeedback("#findFeedback", "Yes! " + w.word + "! ⭐", "good");
       speak("Yes! " + w.word);
       celebrate("Yes!", "🌟", 1);
       findState.round++;
@@ -334,7 +371,7 @@
     } else {
       tile.classList.add("wrong");
       setFeedback("#findFeedback", "Try again! 👀", "try");
-      speak("Find the " + findState.target.word, { rate: 0.75 });
+      speak(findState.target.word, { rate: 0.75 });
       setTimeout(() => tile.classList.remove("wrong"), 500);
     }
   }
@@ -414,7 +451,7 @@
     });
 
     // Say It actions
-    $("#btnListen").addEventListener("click", () => speak(currentWord().word));
+    $("#btnListen").addEventListener("click", () => speak(sayText(currentWord())));
     $("#btnSpeak").addEventListener("click", onSpeakPressed);
     $("#btnSaidIt").addEventListener("click", wordSuccess);
     $("#btnNext").addEventListener("click", nextSay);

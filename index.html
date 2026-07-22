@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#5b6cff" />
   <title>Speak & Play 🌟</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
 </head>
 <body>
@@ -83,7 +83,8 @@
       <div class="progress-dots" id="findProgress"></div>
 
       <div class="find-prompt">
-        <p>Where is the…</p>
+        <p id="findPromptText">Where is the…</p>
+        <div class="find-target" id="findTarget"></div>
         <button class="big-btn listen" id="btnFindListen">🔊 Say it again</button>
       </div>
 
@@ -103,7 +104,7 @@
     </div>
   </div>
 
-  <script src="words.js"></script>
-  <script src="app.js"></script>
+  <script src="words.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
