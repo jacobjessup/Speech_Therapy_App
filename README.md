@@ -12,7 +12,7 @@ entirely in the browser and works great on a phone or tablet.
 
 ## How to play
 
-1. **Pick a category** on the home screen (Animals, Food, My Body, Colors, …).
+1. **Pick a category** on the home screen (ABC, 123, Animals, Food, Colors, …).
 2. **Choose a game:**
    - **🎤 Say It!** — A big picture appears and the app says the word.
      - Tap **🔊 Listen** to hear it again (nice and slow).
