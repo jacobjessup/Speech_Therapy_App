@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#5b6cff" />
+  <title>Speak & Play 🌟</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- HOME -->
+    <section id="screen-home" class="screen active">
+      <header class="home-header">
+        <h1 class="logo">Speak &amp; Play <span class="wiggle">🌟</span></h1>
+        <div class="star-bank" id="starBank" title="Stars you have earned">
+          <span class="star-bank-icon">⭐</span>
+          <span id="starCount">0</span>
+        </div>
+      </header>
+
+      <p class="tagline">Pick a group of words to practice!</p>
+      <div id="categoryGrid" class="category-grid"></div>
+
+      <div class="mode-note">
+        <p>Then choose a game:</p>
+        <div class="mode-legend">
+          <span><b>🎤 Say It</b> — hear the word, then say it back</span>
+          <span><b>🔍 Find It</b> — hear a word, tap the picture</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODE PICKER -->
+    <section id="screen-mode" class="screen">
+      <button class="back-btn" data-go="home">⬅️ Back</button>
+      <div class="mode-picker">
+        <div class="mode-cat-icon" id="modeCatIcon">🐶</div>
+        <h2 id="modeCatName">Animals</h2>
+        <div class="mode-buttons">
+          <button class="mode-card" data-mode="say">
+            <span class="mode-emoji">🎤</span>
+            <span class="mode-title">Say It!</span>
+            <span class="mode-sub">Practice saying words</span>
+          </button>
+          <button class="mode-card" data-mode="find">
+            <span class="mode-emoji">🔍</span>
+            <span class="mode-title">Find It!</span>
+            <span class="mode-sub">Tap the right picture</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAY IT -->
+    <section id="screen-say" class="screen">
+      <button class="back-btn" data-go="mode">⬅️ Back</button>
+      <div class="progress-dots" id="sayProgress"></div>
+
+      <div class="card" id="sayCard">
+        <div class="card-emoji" id="sayEmoji">🐶</div>
+        <div class="card-word" id="sayWord">dog</div>
+      </div>
+
+      <div id="sayFeedback" class="feedback"></div>
+
+      <div class="action-row">
+        <button class="big-btn listen" id="btnListen">🔊 Listen</button>
+        <button class="big-btn speak" id="btnSpeak">🎤 Your turn</button>
+      </div>
+
+      <div class="secondary-row">
+        <button class="ghost-btn" id="btnSaidIt">😃 He said it!</button>
+        <button class="ghost-btn" id="btnNext">Next ➡️</button>
+      </div>
+    </section>
+
+    <!-- FIND IT -->
+    <section id="screen-find" class="screen">
+      <button class="back-btn" data-go="mode">⬅️ Back</button>
+      <div class="progress-dots" id="findProgress"></div>
+
+      <div class="find-prompt">
+        <p>Where is the…</p>
+        <button class="big-btn listen" id="btnFindListen">🔊 Say it again</button>
+      </div>
+
+      <div id="findGrid" class="find-grid"></div>
+      <div id="findFeedback" class="feedback"></div>
+    </section>
+
+  </div>
+
+  <!-- Celebration overlay -->
+  <div id="celebrate" class="celebrate">
+    <canvas id="confetti"></canvas>
+    <div class="celebrate-inner">
+      <div class="celebrate-emoji" id="celebrateEmoji">🎉</div>
+      <div class="celebrate-text" id="celebrateText">Great job!</div>
+      <div class="celebrate-stars" id="celebrateStars">⭐</div>
+    </div>
+  </div>
+
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
