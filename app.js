@@ -54,6 +54,40 @@
     $("#starCount").textContent = state.stars;
   }
 
+  // ---------- Theme (light / dark) ----------
+  const THEME_KEY = "snp_theme";
+  function currentTheme() {
+    return document.documentElement.getAttribute("data-theme") === "dark"
+      ? "dark" : "light";
+  }
+  function syncThemeUI(t) {
+    const btn = $("#themeToggle");
+    if (btn) {
+      btn.textContent = t === "dark" ? "☀️" : "🌙";
+      btn.setAttribute(
+        "aria-label",
+        t === "dark" ? "Switch to light mode" : "Switch to dark mode"
+      );
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", t === "dark" ? "#15142e" : "#5b6cff");
+  }
+  function applyTheme(t, save) {
+    t = t === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+    if (save) {
+      try { localStorage.setItem(THEME_KEY, t); } catch (_) {}
+    }
+    syncThemeUI(t);
+  }
+  function toggleTheme() {
+    applyTheme(currentTheme() === "dark" ? "light" : "dark", true);
+  }
+  function initTheme() {
+    // The inline <head> script already set data-theme; just sync the button.
+    syncThemeUI(currentTheme());
+  }
+
   // ---------- Custom "My Words" category (saved locally) ----------
   const CUSTOM_KEY = "snp_custom";
   function loadCustom() {
@@ -792,6 +826,9 @@
       });
     });
 
+    // Theme toggle
+    $("#themeToggle").addEventListener("click", toggleTheme);
+
     // Import screen
     $("#importAddBtn").addEventListener("click", doImport);
     $("#importCancelBtn").addEventListener("click", () => {
@@ -818,6 +855,7 @@
   }
 
   // ---------- Go ----------
+  initTheme();
   buildHome();
   bind();
   // If opened via a share link, offer the import; otherwise start at home.

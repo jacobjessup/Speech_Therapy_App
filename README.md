@@ -23,6 +23,9 @@ entirely in the browser and works great on a phone or tablet.
    - **🔍 Find It!** — The app names a word; your child taps the matching picture.
      Great for building understanding even before speech comes.
 3. **Collect stars** ⭐ — they're saved on the device and shown at the top.
+4. **Light or dark?** Tap the 🌙 / ☀️ button (top-right of the home screen) to
+   switch themes — handy for bedtime practice. It follows your device's setting
+   by default and remembers your choice.
 
 ### Learning extras
 

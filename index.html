@@ -5,8 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#5b6cff" />
   <title>Speak & Play 🌟</title>
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
+  <script>
+    // Apply the saved (or system) theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem("snp_theme");
+        if (t !== "dark" && t !== "light") {
+          t = (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches)
+            ? "dark" : "light";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <div id="app">
@@ -15,9 +28,13 @@
     <section id="screen-home" class="screen active">
       <header class="home-header">
         <h1 class="logo">Speak &amp; Play <span class="wiggle">🌟</span></h1>
-        <div class="star-bank" id="starBank" title="Stars you have earned">
-          <span class="star-bank-icon">⭐</span>
-          <span id="starCount">0</span>
+        <div class="header-right">
+          <button class="theme-toggle" id="themeToggle" title="Light / dark"
+                  aria-label="Toggle dark mode">🌙</button>
+          <div class="star-bank" id="starBank" title="Stars you have earned">
+            <span class="star-bank-icon">⭐</span>
+            <span id="starCount">0</span>
+          </div>
         </div>
       </header>
 
@@ -162,8 +179,8 @@
     </div>
   </div>
 
-  <script src="qrcode.js?v=6"></script>
-  <script src="words.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="qrcode.js?v=7"></script>
+  <script src="words.js?v=7"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

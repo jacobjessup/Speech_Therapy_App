@@ -2,14 +2,31 @@
   --bg1: #6a8dff;
   --bg2: #a06cff;
   --card: #ffffff;
+  --surface-2: #f6f4ff;   /* inputs, rows, chips */
+  --border: #e3e0f0;
+  --tile: #ffffff;        /* Find It tiles */
   --ink: #2b2350;
   --accent: #5b6cff;
   --good: #2fbf71;
   --listen: #ff9f1c;
   --speak: #4361ee;
+  --edit-card: #fff4cc;
   --radius: 28px;
   --shadow: 0 12px 30px rgba(40, 30, 90, 0.22);
   font-size: 18px;
+}
+
+/* Dark mode — softer, dimmer surfaces for low-light practice. */
+:root[data-theme="dark"] {
+  --bg1: #2b2555;
+  --bg2: #15142e;
+  --card: #2e2a49;
+  --surface-2: #3a3560;
+  --border: #4a4472;
+  --tile: #2e2a49;
+  --ink: #f1efff;
+  --edit-card: #3a3560;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -67,8 +84,30 @@ body {
   50% { transform: rotate(8deg) scale(1.1); }
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.theme-toggle {
+  border: none;
+  background: var(--card);
+  color: var(--ink);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle:active { transform: scale(0.9); }
+
 .star-bank {
-  background: rgba(255,255,255,0.95);
+  background: var(--card);
   color: var(--ink);
   padding: 8px 16px;
   border-radius: 999px;
@@ -106,7 +145,7 @@ body {
   align-items: center;
   gap: 8px;
   font-family: inherit;
-  color: var(--ink);
+  color: #2b2350;
   transition: transform 0.12s ease;
 }
 .cat-btn:active { transform: scale(0.94); }
@@ -130,7 +169,7 @@ body {
 /* ---------- Back button ---------- */
 .back-btn {
   border: none;
-  background: rgba(255,255,255,0.95);
+  background: var(--card);
   color: var(--ink);
   font-family: inherit;
   font-size: 1.1rem;
@@ -151,7 +190,7 @@ body {
 .mode-card {
   border: none;
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--card);
   color: var(--ink);
   padding: 22px;
   cursor: pointer;
@@ -167,7 +206,7 @@ body {
 .mode-emoji { font-size: 3rem; }
 .mode-title { font-size: 1.5rem; font-weight: bold; }
 .mode-sub { font-size: 1rem; opacity: 0.7; }
-.mode-card.edit-card { background: #fff4cc; }
+.mode-card.edit-card { background: var(--edit-card); }
 
 /* Little count under the "My Words" tile on the home screen. */
 .cat-count {
@@ -179,7 +218,7 @@ body {
 
 /* ---------- Add / Edit My Words ---------- */
 .edit-wrap {
-  background: #fff;
+  background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 22px 18px 26px;
@@ -202,11 +241,11 @@ body {
 .emoji-input, .word-input {
   font-family: inherit;
   font-size: 1.3rem;
-  border: 3px solid #e3e0f0;
+  border: 3px solid var(--border);
   border-radius: 16px;
   padding: 12px;
   color: var(--ink);
-  background: #faf9ff;
+  background: var(--surface-2);
 }
 .emoji-input {
   width: 64px;
@@ -238,7 +277,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #f6f4ff;
+  background: var(--surface-2);
   border-radius: 16px;
   padding: 10px 12px;
 }
@@ -296,10 +335,10 @@ body {
   min-width: 0;
   font-family: inherit;
   font-size: 0.95rem;
-  border: 3px solid #e3e0f0;
+  border: 3px solid var(--border);
   border-radius: 14px;
   padding: 10px;
-  background: #faf9ff;
+  background: var(--surface-2);
   color: var(--ink);
 }
 .copy-btn {
@@ -328,7 +367,7 @@ body {
 .import-title { font-size: 1.8rem; margin: 6px 0; text-shadow: 0 3px 0 rgba(0,0,0,0.15); }
 .import-sub { font-size: 1.1rem; opacity: 0.95; margin: 0 0 16px; }
 .import-preview {
-  background: #fff;
+  background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 16px;
@@ -343,7 +382,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #f6f4ff;
+  background: var(--surface-2);
   border-radius: 999px;
   padding: 8px 14px;
   font-weight: bold;
@@ -492,7 +531,7 @@ body {
   margin-bottom: 14px;
 }
 .find-tile {
-  background: #fff;
+  background: var(--tile);
   border: 5px solid transparent;
   border-radius: var(--radius);
   aspect-ratio: 1 / 1;
