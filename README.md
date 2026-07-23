@@ -50,6 +50,27 @@ entirely in the browser and works great on a phone or tablet.
   travel inside the link's `#` fragment, which is never sent to any server, so
   your list stays private. Re-share after adding new words to sync again.
 
+### Multiple players (profiles)
+
+Siblings can share the app — each player gets their **own words, stars, and
+progress**.
+
+- Tap the **player bar** under the title (e.g. "⭐ Star  switch ⌄") to open
+  **Who's playing?**
+- Tap a player to switch to them; tap **➕ New player** to add one (choose an
+  emoji avatar and a name).
+- **➕ New player**, **Remove players**, and the **Add / Edit Words** editor are
+  behind a quick **grown-up check** (a simple sum like "what is 7 + 5?") so a
+  little one can't wander in and change things.
+
+> **About "accounts":** this is a family-friendly, on-device design — no logins,
+> no passwords, and nothing is uploaded. That's deliberate: a password checked in
+> the browser wouldn't actually be secure, and keeping a young child's data on
+> the device (not in the cloud) avoids children's-privacy concerns entirely. The
+> grown-up check is a child-lock, not real security. To move a player's words to
+> another device, use **Share my words** (link or QR). Everyone's data lives in
+> that browser, so clearing site data would erase it.
+
 ## Tips for grown-ups
 
 - **Model first, then wait.** Let the app (or you) say the word, then give your

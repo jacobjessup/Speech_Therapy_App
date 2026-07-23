@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#5b6cff" />
   <title>Speak & Play 🌟</title>
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
   <script>
     // Apply the saved (or system) theme before first paint to avoid a flash.
@@ -37,6 +37,12 @@
           </div>
         </div>
       </header>
+
+      <button class="profile-bar" id="profileBar" title="Switch player">
+        <span class="profile-ava" id="profileAva">⭐</span>
+        <span class="profile-name" id="profileName">Star</span>
+        <span class="profile-switch">switch ⌄</span>
+      </button>
 
       <p class="tagline">Pick a group of words to practice!</p>
       <div id="categoryGrid" class="category-grid"></div>
@@ -167,6 +173,45 @@
       </div>
     </section>
 
+    <!-- PROFILES -->
+    <section id="screen-profiles" class="screen">
+      <button class="back-btn" data-go="home">⬅️ Back</button>
+      <div class="profiles-wrap">
+        <h2 class="profiles-title">Who's playing? 🌟</h2>
+        <p class="profiles-help">Each player keeps their own words, stars, and progress.</p>
+        <div id="profilesGrid" class="profiles-grid"></div>
+
+        <form class="add-profile-form" id="addProfileForm" style="display:none">
+          <input id="profAva" class="emoji-input" maxlength="6"
+                 placeholder="⭐" aria-label="avatar" autocomplete="off" />
+          <input id="profNameInput" class="word-input" maxlength="20"
+                 placeholder="player name" aria-label="name"
+                 autocomplete="off" />
+          <button type="submit" class="add-btn">Add</button>
+        </form>
+
+        <div class="profiles-actions">
+          <button type="button" class="share-btn" id="addProfileBtn">➕ New player</button>
+          <button type="button" class="ghost-btn" id="manageProfilesBtn">🗑️ Remove players</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Parent gate overlay -->
+  <div id="gate" class="gate">
+    <div class="gate-box">
+      <div class="gate-emoji">🔒</div>
+      <p class="gate-q" id="gateQ">Grown-ups: what is 3 + 4?</p>
+      <input id="gateInput" class="gate-input" type="number" inputmode="numeric"
+             aria-label="answer" />
+      <div class="gate-actions">
+        <button type="button" class="ghost-btn" id="gateCancel">Cancel</button>
+        <button type="button" class="big-btn speak" id="gateOk">OK</button>
+      </div>
+      <p id="gateMsg" class="gate-msg"></p>
+    </div>
   </div>
 
   <!-- Celebration overlay -->
@@ -179,8 +224,8 @@
     </div>
   </div>
 
-  <script src="qrcode.js?v=7"></script>
-  <script src="words.js?v=7"></script>
-  <script src="app.js?v=7"></script>
+  <script src="qrcode.js?v=8"></script>
+  <script src="words.js?v=8"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

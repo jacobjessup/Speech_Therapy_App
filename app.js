@@ -15,7 +15,6 @@
     category: null,
     order: [],        // shuffled indices into category.words for "Say It"
     pos: 0,
-    stars: loadStars(),
   };
 
   // ---------- Element helpers ----------
@@ -27,6 +26,7 @@
     find: $("#screen-find"),
     edit: $("#screen-edit"),
     import: $("#screen-import"),
+    profiles: $("#screen-profiles"),
   };
 
   function show(name) {
@@ -37,21 +37,80 @@
     if (name === "home") buildHome();
   }
 
-  // ---------- Stars (saved locally) ----------
-  function loadStars() {
-    const n = parseInt(localStorage.getItem("snp_stars") || "0", 10);
-    return isNaN(n) ? 0 : n;
+  // ---------- Profiles + saved data (all on-device) ----------
+  // Everything a family creates lives in one localStorage object:
+  //   { activeId, profiles: [ { id, name, avatar, stars, words:[] } ] }
+  // Each child is a profile with their own stars and My Words list. No
+  // server, no login — just separate local sandboxes on the device.
+  const STORE_KEY = "snp_v1";
+
+  function genId() {
+    return "p" + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
   }
-  function saveStars() {
-    localStorage.setItem("snp_stars", String(state.stars));
+  function blankProfile(name, avatar) {
+    return { id: genId(), name: name || "Star", avatar: avatar || "⭐", stars: 0, words: [] };
   }
+  function normalizeProfile(p) {
+    return {
+      id: typeof p.id === "string" && p.id ? p.id : genId(),
+      name: typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0, 20) : "Star",
+      avatar: typeof p.avatar === "string" && p.avatar.trim() ? p.avatar.trim().slice(0, 8) : "⭐",
+      stars: typeof p.stars === "number" && p.stars >= 0 ? p.stars : 0,
+      words: Array.isArray(p.words)
+        ? p.words.filter((w) => w && typeof w.word === "string" && w.word.trim())
+        : [],
+    };
+  }
+
+  // First run (or upgrade from the old single-user version): build a store,
+  // migrating any existing stars / My Words into a starter profile.
+  function migrateOrInit() {
+    const prof = blankProfile("Star", "⭐");
+    try {
+      const s = parseInt(localStorage.getItem("snp_stars") || "0", 10);
+      if (!isNaN(s)) prof.stars = s;
+      const c = JSON.parse(localStorage.getItem("snp_custom") || "[]");
+      if (Array.isArray(c)) prof.words = c.filter((w) => w && typeof w.word === "string");
+    } catch (_) {}
+    const d = { activeId: prof.id, profiles: [prof] };
+    localStorage.setItem(STORE_KEY, JSON.stringify(d));
+    return d;
+  }
+
+  function loadStore() {
+    try {
+      const d = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (d && Array.isArray(d.profiles) && d.profiles.length) {
+        d.profiles = d.profiles.map(normalizeProfile);
+        if (!d.profiles.some((p) => p.id === d.activeId)) d.activeId = d.profiles[0].id;
+        return d;
+      }
+    } catch (_) {}
+    return migrateOrInit();
+  }
+
+  let store = loadStore();
+  function saveStore() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }
+  function activeProfile() {
+    return store.profiles.find((p) => p.id === store.activeId) || store.profiles[0];
+  }
+  function switchProfile(id) {
+    if (store.profiles.some((p) => p.id === id)) {
+      store.activeId = id;
+      saveStore();
+    }
+  }
+
+  // ---------- Stars (per active profile) ----------
   function addStar(n) {
-    state.stars += n;
-    saveStars();
+    activeProfile().stars += n;
+    saveStore();
     renderStars();
   }
   function renderStars() {
-    $("#starCount").textContent = state.stars;
+    $("#starCount").textContent = activeProfile().stars;
   }
 
   // ---------- Theme (light / dark) ----------
@@ -88,19 +147,155 @@
     syncThemeUI(currentTheme());
   }
 
-  // ---------- Custom "My Words" category (saved locally) ----------
-  const CUSTOM_KEY = "snp_custom";
-  function loadCustom() {
-    try {
-      const raw = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]");
-      if (!Array.isArray(raw)) return [];
-      return raw.filter((w) => w && typeof w.word === "string" && w.word.trim());
-    } catch (_) {
-      return [];
+  // ---------- Parent gate (a friendly grown-up check, not real security) ----------
+  // A quick sum keeps a 4-year-old out of the editor and profile management.
+  // It is intentionally NOT a password — nothing here is sensitive.
+  let gateAnswer = 0, gateCb = null;
+  function openGate(cb) {
+    const a = 2 + Math.floor(Math.random() * 8);
+    const b = 2 + Math.floor(Math.random() * 8);
+    gateAnswer = a + b;
+    gateCb = cb;
+    $("#gateQ").textContent = "Grown-ups: what is " + a + " + " + b + "?";
+    $("#gateInput").value = "";
+    $("#gateMsg").textContent = "";
+    $("#gate").classList.add("show");
+    setTimeout(() => $("#gateInput").focus(), 60);
+  }
+  function closeGate() {
+    $("#gate").classList.remove("show");
+    gateCb = null;
+  }
+  function submitGate() {
+    if (parseInt($("#gateInput").value, 10) === gateAnswer) {
+      const cb = gateCb;
+      closeGate();
+      if (cb) cb();
+    } else {
+      $("#gateMsg").textContent = "Not quite — try again.";
+      $("#gateInput").value = "";
+      $("#gateInput").focus();
     }
   }
+
+  // ---------- Profiles UI ----------
+  let manageProfiles = false;
+
+  function updateProfileBar() {
+    const p = activeProfile();
+    $("#profileAva").textContent = p.avatar;
+    $("#profileName").textContent = p.name;
+  }
+
+  function openProfiles() {
+    manageProfiles = false;
+    hideAddProfileForm();
+    renderProfiles();
+    show("profiles");
+  }
+
+  function renderProfiles() {
+    const grid = $("#profilesGrid");
+    grid.innerHTML = "";
+    store.profiles.forEach((p) => {
+      const card = document.createElement("button");
+      card.className = "profile-card" + (p.id === store.activeId ? " active" : "");
+      const ava = document.createElement("span");
+      ava.className = "profile-card-ava";
+      ava.textContent = p.avatar;
+      const name = document.createElement("span");
+      name.className = "profile-card-name";
+      name.textContent = p.name;
+      const stars = document.createElement("span");
+      stars.className = "profile-card-stars";
+      stars.textContent = "⭐ " + p.stars;
+      card.appendChild(ava);
+      card.appendChild(name);
+      card.appendChild(stars);
+      if (manageProfiles && store.profiles.length > 1) {
+        const del = document.createElement("span");
+        del.className = "profile-del";
+        del.textContent = "✕";
+        del.setAttribute("role", "button");
+        del.setAttribute("aria-label", "Remove " + p.name);
+        del.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deleteProfile(p.id);
+        });
+        card.appendChild(del);
+      }
+      card.addEventListener("click", () => {
+        if (manageProfiles) return; // manage mode: tapping doesn't switch
+        selectProfile(p.id);
+      });
+      grid.appendChild(card);
+    });
+    $("#manageProfilesBtn").textContent = manageProfiles ? "✓ Done" : "🗑️ Remove players";
+    $("#manageProfilesBtn").style.display = store.profiles.length > 1 ? "inline-block" : "none";
+  }
+
+  function selectProfile(id) {
+    switchProfile(id);
+    updateProfileBar();
+    renderStars();
+    show("home");
+  }
+
+  function showAddProfileForm() {
+    $("#addProfileForm").style.display = "flex";
+    $("#profNameInput").focus();
+  }
+  function hideAddProfileForm() {
+    const f = $("#addProfileForm");
+    if (f) {
+      f.style.display = "none";
+      $("#profNameInput").value = "";
+      $("#profAva").value = "";
+    }
+  }
+  function saveNewProfile() {
+    const name = $("#profNameInput").value.trim();
+    const avatar = $("#profAva").value.trim();
+    if (!name) { $("#profNameInput").focus(); return; }
+    const p = blankProfile(name, avatar || "⭐");
+    store.profiles.push(p);
+    store.activeId = p.id;
+    saveStore();
+    hideAddProfileForm();
+    updateProfileBar();
+    renderStars();
+    renderProfiles();
+  }
+
+  function deleteProfile(id) {
+    if (store.profiles.length <= 1) return; // always keep at least one
+    const wasActive = id === store.activeId;
+    store.profiles = store.profiles.filter((p) => p.id !== id);
+    if (wasActive) store.activeId = store.profiles[0].id;
+    saveStore();
+    updateProfileBar();
+    renderStars();
+    renderProfiles();
+  }
+
+  function toggleManage() {
+    if (manageProfiles) {
+      manageProfiles = false;
+      renderProfiles();
+    } else {
+      openGate(() => { manageProfiles = true; renderProfiles(); });
+    }
+  }
+
+  // ---------- Custom "My Words" category (saved locally) ----------
+  function loadCustom() {
+    return (activeProfile().words || []).filter(
+      (w) => w && typeof w.word === "string" && w.word.trim()
+    );
+  }
   function saveCustom(words) {
-    localStorage.setItem(CUSTOM_KEY, JSON.stringify(words));
+    activeProfile().words = words;
+    saveStore();
   }
   // A category object like the ones in words.js, but its words come from
   // whatever the grown-up has added. Refreshed from storage on open.
@@ -806,7 +1001,7 @@
         const mode = btn.getAttribute("data-mode");
         if (mode === "say") startSay();
         else if (mode === "find") startFind();
-        else if (mode === "edit") openEdit();
+        else if (mode === "edit") openGate(openEdit);
       });
     });
 
@@ -828,6 +1023,22 @@
 
     // Theme toggle
     $("#themeToggle").addEventListener("click", toggleTheme);
+
+    // Profiles
+    $("#profileBar").addEventListener("click", openProfiles);
+    $("#addProfileBtn").addEventListener("click", () => openGate(showAddProfileForm));
+    $("#manageProfilesBtn").addEventListener("click", toggleManage);
+    $("#addProfileForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      saveNewProfile();
+    });
+
+    // Parent gate
+    $("#gateOk").addEventListener("click", submitGate);
+    $("#gateCancel").addEventListener("click", closeGate);
+    $("#gateInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); submitGate(); }
+    });
 
     // Import screen
     $("#importAddBtn").addEventListener("click", doImport);
@@ -856,6 +1067,7 @@
 
   // ---------- Go ----------
   initTheme();
+  updateProfileBar();
   buildHome();
   bind();
   // If opened via a share link, offer the import; otherwise start at home.
