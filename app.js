@@ -25,12 +25,15 @@
     mode: $("#screen-mode"),
     say: $("#screen-say"),
     find: $("#screen-find"),
+    edit: $("#screen-edit"),
   };
 
   function show(name) {
     Object.values(screens).forEach((s) => s.classList.remove("active"));
     screens[name].classList.add("active");
     window.scrollTo(0, 0);
+    // Refresh the home grid so the "My Words" count stays current.
+    if (name === "home") buildHome();
   }
 
   // ---------- Stars (saved locally) ----------
@@ -48,6 +51,33 @@
   }
   function renderStars() {
     $("#starCount").textContent = state.stars;
+  }
+
+  // ---------- Custom "My Words" category (saved locally) ----------
+  const CUSTOM_KEY = "snp_custom";
+  function loadCustom() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]");
+      if (!Array.isArray(raw)) return [];
+      return raw.filter((w) => w && typeof w.word === "string" && w.word.trim());
+    } catch (_) {
+      return [];
+    }
+  }
+  function saveCustom(words) {
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(words));
+  }
+  // A category object like the ones in words.js, but its words come from
+  // whatever the grown-up has added. Refreshed from storage on open.
+  const customCategory = {
+    id: "custom",
+    name: "My Words",
+    icon: "💛",
+    color: "#ffe08a",
+    words: [],
+  };
+  function allCategories() {
+    return CATEGORIES.concat([customCategory]);
   }
 
   // ---------- Speech synthesis ("Listen") ----------
@@ -182,13 +212,25 @@
     renderStars();
     const grid = $("#categoryGrid");
     grid.innerHTML = "";
-    CATEGORIES.forEach((cat) => {
+    allCategories().forEach((cat) => {
       const btn = document.createElement("button");
       btn.className = "cat-btn";
       btn.style.background = cat.color;
-      btn.innerHTML =
-        '<span class="cat-icon">' + cat.icon + "</span>" +
-        '<span class="cat-name">' + cat.name + "</span>";
+      const icon = document.createElement("span");
+      icon.className = "cat-icon";
+      icon.textContent = cat.icon;
+      const name = document.createElement("span");
+      name.className = "cat-name";
+      name.textContent = cat.name;
+      btn.appendChild(icon);
+      btn.appendChild(name);
+      if (cat.id === "custom") {
+        const n = loadCustom().length;
+        const count = document.createElement("span");
+        count.className = "cat-count";
+        count.textContent = n ? n + (n === 1 ? " word" : " words") : "tap to add";
+        btn.appendChild(count);
+      }
       btn.addEventListener("click", () => openCategory(cat));
       grid.appendChild(btn);
     });
@@ -196,8 +238,11 @@
 
   function openCategory(cat) {
     state.category = cat;
+    if (cat.id === "custom") cat.words = loadCustom();
     $("#modeCatIcon").textContent = cat.icon;
     $("#modeCatName").textContent = cat.name;
+    // The "Add / Edit Words" card only makes sense for My Words.
+    $("#editModeCard").style.display = cat.id === "custom" ? "flex" : "none";
     show("mode");
   }
 
@@ -211,8 +256,70 @@
     return a;
   }
 
+  // ---------- Custom word editor ----------
+  function openEdit() {
+    renderCustomList();
+    show("edit");
+  }
+
+  function renderCustomList() {
+    const list = $("#customList");
+    list.innerHTML = "";
+    const words = loadCustom();
+    if (!words.length) {
+      const empty = document.createElement("p");
+      empty.className = "custom-empty";
+      empty.textContent = "No words yet. Add your first one above! 👆";
+      list.appendChild(empty);
+      return;
+    }
+    words.forEach((w, i) => {
+      const row = document.createElement("div");
+      row.className = "custom-row";
+      const pic = document.createElement("span");
+      pic.className = "custom-row-emoji";
+      pic.textContent = w.emoji || "⭐";
+      const label = document.createElement("span");
+      label.className = "custom-row-word";
+      label.textContent = w.word;
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "custom-del";
+      del.textContent = "🗑️";
+      del.setAttribute("aria-label", "Delete " + w.word);
+      del.addEventListener("click", () => {
+        const cur = loadCustom();
+        cur.splice(i, 1);
+        saveCustom(cur);
+        renderCustomList();
+      });
+      row.appendChild(pic);
+      row.appendChild(label);
+      row.appendChild(del);
+      list.appendChild(row);
+    });
+  }
+
+  function addCustomWord() {
+    const emojiEl = $("#newEmoji");
+    const wordEl = $("#newWord");
+    const word = wordEl.value.trim();
+    const emoji = emojiEl.value.trim();
+    if (!word) { wordEl.focus(); return; }
+    const words = loadCustom();
+    words.push({ word: word, emoji: emoji || "⭐" });
+    saveCustom(words);
+    emojiEl.value = "";
+    wordEl.value = "";
+    renderCustomList();
+    wordEl.focus();
+    speak(word); // model the new word once so the grown-up hears it
+  }
+
   // ---------- SAY IT mode ----------
   function startSay() {
+    if (state.category.id === "custom") state.category.words = loadCustom();
+    if (!state.category.words.length) return openEdit();
     state.order = shuffled(state.category.words.map((_, i) => i));
     state.pos = 0;
     renderSay();
@@ -311,6 +418,8 @@
   const findState = { target: null, tiles: [], round: 0, rounds: 6 };
 
   function startFind() {
+    if (state.category.id === "custom") state.category.words = loadCustom();
+    if (!state.category.words.length) return openEdit();
     findState.round = 0;
     nextFind();
     show("find");
@@ -446,8 +555,15 @@
       btn.addEventListener("click", () => {
         const mode = btn.getAttribute("data-mode");
         if (mode === "say") startSay();
-        else startFind();
+        else if (mode === "find") startFind();
+        else if (mode === "edit") openEdit();
       });
+    });
+
+    // Add-a-word form (My Words editor)
+    $("#addWordForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      addCustomWord();
     });
 
     // Say It actions

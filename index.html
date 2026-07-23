@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#5b6cff" />
   <title>Speak & Play 🌟</title>
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
 </head>
 <body>
@@ -50,6 +50,11 @@
             <span class="mode-title">Find It!</span>
             <span class="mode-sub">Tap the right picture</span>
           </button>
+          <button class="mode-card edit-card" id="editModeCard" data-mode="edit" style="display:none">
+            <span class="mode-emoji">✏️</span>
+            <span class="mode-title">Add / Edit Words</span>
+            <span class="mode-sub">For grown-ups</span>
+          </button>
         </div>
       </div>
     </section>
@@ -92,6 +97,28 @@
       <div id="findFeedback" class="feedback"></div>
     </section>
 
+    <!-- ADD / EDIT MY WORDS -->
+    <section id="screen-edit" class="screen">
+      <button class="back-btn" data-go="mode">⬅️ Back</button>
+      <div class="edit-wrap">
+        <h2 class="edit-title">My Words 💛</h2>
+        <p class="edit-help">
+          Add words your child loves — names, foods, toys, pets. Tap the picture
+          box and use your keyboard's emoji 😀 button to choose a picture, type
+          the word, then press Add.
+        </p>
+        <form class="add-word-form" id="addWordForm">
+          <input id="newEmoji" class="emoji-input" maxlength="6"
+                 placeholder="😀" aria-label="picture" autocomplete="off" />
+          <input id="newWord" class="word-input" maxlength="24"
+                 placeholder="type a word" aria-label="word"
+                 autocomplete="off" autocapitalize="none" />
+          <button type="submit" class="add-btn" id="addWordBtn">➕ Add</button>
+        </form>
+        <div id="customList" class="custom-list"></div>
+      </div>
+    </section>
+
   </div>
 
   <!-- Celebration overlay -->
@@ -104,7 +131,7 @@
     </div>
   </div>
 
-  <script src="words.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="words.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

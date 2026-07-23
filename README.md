@@ -32,6 +32,11 @@ entirely in the browser and works great on a phone or tablet.
 - **Counting** shows a group of objects (🐟🐟🐟) so your child can count them
   and say **how many** — great early number sense to go with the **123**
   numerals.
+- **My Words 💛** is your own custom category. Tap it, then **Add / Edit Words**
+  to add the words your child loves — names, pets, favorite foods, toys. Tap the
+  picture box and use your keyboard's emoji 😀 button to pick a picture, type the
+  word, and press **Add**. They're saved on the device and play in both **Say
+  It!** and **Find It!** just like the built-in words. Tap 🗑️ to remove one.
 
 ## Tips for grown-ups
 
