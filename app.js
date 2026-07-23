@@ -374,6 +374,46 @@
     return Promise.resolve();
   }
 
+  // Draw a scannable QR code of the share link (vendored qrcode.js).
+  function renderQr(url) {
+    const wrap = $("#qrWrap");
+    const canvas = $("#qrCanvas");
+    if (typeof qrcode === "undefined") { wrap.style.display = "none"; return; }
+    try {
+      const qr = qrcode(0, "M"); // type 0 = auto-size, Medium error correction
+      qr.addData(url);
+      qr.make();
+      const count = qr.getModuleCount();
+      const margin = 4;   // quiet zone, in modules
+      const target = 240; // desired on-screen size, in px
+      const cell = Math.max(2, Math.floor(target / (count + margin * 2)));
+      const dim = cell * (count + margin * 2);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = dim * dpr;
+      canvas.height = dim * dpr;
+      canvas.style.width = dim + "px";
+      canvas.style.height = dim + "px";
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, dim, dim);
+      ctx.fillStyle = "#000000";
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) {
+            ctx.fillRect((c + margin) * cell, (r + margin) * cell, cell, cell);
+          }
+        }
+      }
+      canvas.style.display = "block";
+      wrap.style.display = "block";
+    } catch (_) {
+      // Too many words to fit in a QR — the copyable link still works.
+      canvas.style.display = "none";
+      wrap.style.display = "none";
+    }
+  }
+
   async function shareWords() {
     const msg = $("#shareMsg");
     const words = loadCustom();
@@ -384,6 +424,7 @@
     const url = buildShareUrl();
     $("#shareLink").value = url;
     $("#shareBox").classList.add("show");
+    renderQr(url);
     msg.textContent = "";
     if (navigator.share) {
       try {

@@ -277,6 +277,18 @@ body {
 .share-btn:active { transform: scale(0.97); }
 .share-box { display: none; margin-top: 14px; }
 .share-box.show { display: block; }
+.qr-wrap { text-align: center; margin-bottom: 16px; }
+.qr-canvas {
+  display: none;
+  margin: 0 auto;
+  border-radius: 12px;
+  padding: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(40, 30, 90, 0.18);
+  image-rendering: pixelated;
+  max-width: 100%;
+}
+.qr-caption { font-size: 0.9rem; opacity: 0.75; margin: 10px 0 0; }
 .share-help { font-size: 0.9rem; opacity: 0.8; margin: 0 0 8px; }
 .share-row { display: flex; gap: 8px; }
 .share-link {
