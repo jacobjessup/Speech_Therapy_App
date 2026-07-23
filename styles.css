@@ -260,6 +260,92 @@ body {
 }
 .custom-del:active { transform: scale(0.9); }
 
+/* ---------- Share & sync ---------- */
+.share-section { margin-top: 22px; text-align: center; }
+.share-btn {
+  width: 100%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.share-btn:active { transform: scale(0.97); }
+.share-box { display: none; margin-top: 14px; }
+.share-box.show { display: block; }
+.share-help { font-size: 0.9rem; opacity: 0.8; margin: 0 0 8px; }
+.share-row { display: flex; gap: 8px; }
+.share-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  border: 3px solid #e3e0f0;
+  border-radius: 14px;
+  padding: 10px;
+  background: #faf9ff;
+  color: var(--ink);
+}
+.copy-btn {
+  flex: 0 0 auto;
+  border: none;
+  background: var(--good);
+  color: #fff;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 0 18px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.copy-btn:active { transform: scale(0.95); }
+.share-msg {
+  min-height: 1.2em;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--accent);
+  margin: 10px 0 0;
+}
+
+/* ---------- Import shared words ---------- */
+.import-wrap { text-align: center; color: #fff; padding-top: 16px; }
+.import-emoji { font-size: 5rem; animation: pop 2s ease-in-out infinite; }
+.import-title { font-size: 1.8rem; margin: 6px 0; text-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+.import-sub { font-size: 1.1rem; opacity: 0.95; margin: 0 0 16px; }
+.import-preview {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 22px;
+  color: var(--ink);
+}
+.import-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f6f4ff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: bold;
+}
+.import-chip .chip-emoji { font-size: 1.4rem; }
+.import-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.import-actions .big-btn { flex: none; }
+
 /* ---------- Progress dots ---------- */
 .progress-dots {
   display: flex;

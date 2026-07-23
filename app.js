@@ -26,6 +26,7 @@
     say: $("#screen-say"),
     find: $("#screen-find"),
     edit: $("#screen-edit"),
+    import: $("#screen-import"),
   };
 
   function show(name) {
@@ -316,6 +317,180 @@
     speak(word); // model the new word once so the grown-up hears it
   }
 
+  // ---------- Share & sync (link carries the words in its #hash) ----------
+  // The words live in the URL fragment, which never gets sent to any server,
+  // so the list stays private to whoever holds the link.
+  function encodeWords(words) {
+    const json = JSON.stringify(
+      words.map((w) => ({ w: w.word, e: w.emoji || "" }))
+    );
+    const bytes = new TextEncoder().encode(json);
+    let bin = "";
+    bytes.forEach((b) => (bin += String.fromCharCode(b)));
+    // URL-safe base64 (no +, /, or = to survive being pasted anywhere).
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function decodeWords(str) {
+    try {
+      let b64 = String(str).replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      const bin = atob(b64);
+      const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+      const arr = JSON.parse(new TextDecoder().decode(bytes));
+      if (!Array.isArray(arr)) return [];
+      return arr
+        .map((o) => ({
+          word: typeof o.w === "string" ? o.w.trim().slice(0, 40) : "",
+          emoji: typeof o.e === "string" ? o.e.slice(0, 8) : "",
+        }))
+        .filter((o) => o.word)
+        .slice(0, 300);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function buildShareUrl() {
+    return (
+      location.origin + location.pathname + location.search +
+      "#words=" + encodeWords(loadCustom())
+    );
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    // Fallback for older browsers.
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (_) {}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  async function shareWords() {
+    const msg = $("#shareMsg");
+    const words = loadCustom();
+    if (!words.length) {
+      msg.textContent = "Add some words first! 👆";
+      return;
+    }
+    const url = buildShareUrl();
+    $("#shareLink").value = url;
+    $("#shareBox").classList.add("show");
+    msg.textContent = "";
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My Words",
+          text: "Open our Speak & Play words:",
+          url: url,
+        });
+        return;
+      } catch (_) {
+        // Share sheet cancelled — the copyable link is still shown below.
+      }
+    } else {
+      copyToClipboard(url).then(() => {
+        msg.textContent = "Link copied! Paste it anywhere. 📋";
+      });
+    }
+  }
+
+  // ---------- Import shared words ----------
+  let pendingImport = null;
+
+  function clearHash() {
+    if (history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search);
+    } else {
+      location.hash = "";
+    }
+  }
+
+  // Merge incoming words into the saved list, skipping ones we already have.
+  function mergeCustom(incoming) {
+    const cur = loadCustom();
+    const have = new Set(cur.map((w) => w.word.trim().toLowerCase()));
+    let added = 0;
+    incoming.forEach((w) => {
+      const key = w.word.trim().toLowerCase();
+      if (!key || have.has(key)) return;
+      have.add(key);
+      cur.push({ word: w.word.trim(), emoji: w.emoji || "⭐" });
+      added++;
+    });
+    saveCustom(cur);
+    return added;
+  }
+
+  function renderImportPreview(words) {
+    $("#importTitle").textContent =
+      words.length === 1
+        ? "Someone shared 1 word!"
+        : "Someone shared " + words.length + " words!";
+    const box = $("#importPreview");
+    box.innerHTML = "";
+    words.slice(0, 24).forEach((w) => {
+      const chip = document.createElement("span");
+      chip.className = "import-chip";
+      const e = document.createElement("span");
+      e.className = "chip-emoji";
+      e.textContent = w.emoji || "⭐";
+      const t = document.createElement("span");
+      t.textContent = w.word;
+      chip.appendChild(e);
+      chip.appendChild(t);
+      box.appendChild(chip);
+    });
+    if (words.length > 24) {
+      const more = document.createElement("span");
+      more.className = "import-chip";
+      more.textContent = "+" + (words.length - 24) + " more";
+      box.appendChild(more);
+    }
+  }
+
+  // If the page was opened with a #words=... link, offer to import them.
+  function checkImportFromUrl() {
+    const m = location.hash.match(/[#&]words=([^&]+)/);
+    if (!m) return false;
+    const incoming = decodeWords(decodeURIComponent(m[1]));
+    if (!incoming.length) {
+      clearHash();
+      return false;
+    }
+    pendingImport = incoming;
+    renderImportPreview(incoming);
+    show("import");
+    return true;
+  }
+
+  function doImport() {
+    if (!pendingImport) return show("home");
+    const added = mergeCustom(pendingImport);
+    pendingImport = null;
+    clearHash();
+    // Drop the grown-up into the My Words editor to see the result.
+    state.category = customCategory;
+    customCategory.words = loadCustom();
+    $("#editModeCard").style.display = "flex";
+    $("#modeCatIcon").textContent = customCategory.icon;
+    $("#modeCatName").textContent = customCategory.name;
+    openEdit();
+    if (added > 0) {
+      celebrate(added === 1 ? "Added 1 word!" : "Added " + added + " words!", "🎉", 0);
+    } else {
+      $("#shareMsg").textContent = "Those words were already saved. 👍";
+    }
+  }
+
   // ---------- SAY IT mode ----------
   function startSay() {
     if (state.category.id === "custom") state.category.words = loadCustom();
@@ -566,6 +741,24 @@
       addCustomWord();
     });
 
+    // Share & sync
+    $("#shareBtn").addEventListener("click", shareWords);
+    $("#copyLinkBtn").addEventListener("click", () => {
+      const input = $("#shareLink");
+      input.select();
+      copyToClipboard(input.value).then(() => {
+        $("#shareMsg").textContent = "Copied! 📋";
+      });
+    });
+
+    // Import screen
+    $("#importAddBtn").addEventListener("click", doImport);
+    $("#importCancelBtn").addEventListener("click", () => {
+      pendingImport = null;
+      clearHash();
+      show("home");
+    });
+
     // Say It actions
     $("#btnListen").addEventListener("click", () => speak(sayText(currentWord())));
     $("#btnSpeak").addEventListener("click", onSpeakPressed);
@@ -586,5 +779,6 @@
   // ---------- Go ----------
   buildHome();
   bind();
-  show("home");
+  // If opened via a share link, offer the import; otherwise start at home.
+  if (!checkImportFromUrl()) show("home");
 })();

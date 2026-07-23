@@ -37,6 +37,14 @@ entirely in the browser and works great on a phone or tablet.
   picture box and use your keyboard's emoji 😀 button to pick a picture, type the
   word, and press **Add**. They're saved on the device and play in both **Say
   It!** and **Find It!** just like the built-in words. Tap 🗑️ to remove one.
+- **Sync across devices with a link.** In **My Words → Add / Edit Words**, tap
+  **🔗 Share my words**. On a phone/tablet this opens the normal share sheet
+  (Messages, AirDrop, email…); everywhere it also shows a **copyable link**.
+  Open that link on another device and you'll get a friendly **"add these
+  words?"** screen — tap **Add to My Words** and they're merged in (duplicates
+  are skipped). The words travel inside the link's `#` fragment, which is never
+  sent to any server, so your list stays private. Re-share after adding new
+  words to sync again.
 
 ## Tips for grown-ups
 

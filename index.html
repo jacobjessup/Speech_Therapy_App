@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#5b6cff" />
   <title>Speak & Play 🌟</title>
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>" />
 </head>
 <body>
@@ -116,6 +116,33 @@
           <button type="submit" class="add-btn" id="addWordBtn">➕ Add</button>
         </form>
         <div id="customList" class="custom-list"></div>
+
+        <div class="share-section">
+          <button type="button" class="share-btn" id="shareBtn">🔗 Share my words</button>
+          <div class="share-box" id="shareBox">
+            <p class="share-help">Open this link on another device (phone, tablet)
+              to add these words there:</p>
+            <div class="share-row">
+              <input id="shareLink" class="share-link" readonly aria-label="share link" />
+              <button type="button" class="copy-btn" id="copyLinkBtn">Copy</button>
+            </div>
+          </div>
+          <p id="shareMsg" class="share-msg"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMPORT SHARED WORDS -->
+    <section id="screen-import" class="screen">
+      <div class="import-wrap">
+        <div class="import-emoji">🎁</div>
+        <h2 class="import-title" id="importTitle">Someone shared words!</h2>
+        <p class="import-sub">Add these to <b>My Words</b> on this device?</p>
+        <div id="importPreview" class="import-preview"></div>
+        <div class="import-actions">
+          <button class="big-btn speak" id="importAddBtn">➕ Add to My Words</button>
+          <button class="ghost-btn" id="importCancelBtn">Not now</button>
+        </div>
       </div>
     </section>
 
@@ -131,7 +158,7 @@
     </div>
   </div>
 
-  <script src="words.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="words.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
